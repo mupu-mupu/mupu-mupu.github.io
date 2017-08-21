@@ -5,7 +5,15 @@ date: 2016-11-21 11:29:08 +0800
 tags: [Android, ThreadPool]
 ---
 
-## 线程基本函数 ##
+## Java线程 ##
+
+ - 继承Thread并重写run方法
+ - 实现Runnable接口
+ 
+
+ Thread本身实现了Runnable接口，通过一些状态对Thread进行管理与调度。
+
+### 基本函数 ###
 
  - wait()
 执行wait()方法时，线程会进入到一个和对象相关的等待池中，同时`释放了该对象的线程锁`,可以使用notify、notifyAll、指定睡眠时间来唤醒当前线程。
@@ -23,8 +31,39 @@ tags: [Android, ThreadPool]
 ----------
 
 
+## Android中的线程 ##
+
+> * AsyncTask（Android 3.0以后不支持并发）
+> * HandlerThread
+> * IntentService
+ 
+
+### AsyncTask(重点介绍) ###
+
+#### AsyncTask作为轻量级的异步任务类，主要用于后台执行任务并更新UI。
+
+```java
+//泛型支持
+public abstract class AsyncTask<Params, ProgressType, ResultType>
+
+//重写AsyncTask四个方法
+public class MyThreadTask extends AsyncTask{Params, ProgressType, ResultType}
+
+//执行后台任务
+MyThreadTask.execute(param, param1, param2);
+
+```
+ 
+ - onPreExecute()
+ - doInBackground  (Param...        params)
+ - onProgressUpdate(ProgressType... progress)
+ - onPostExecute   (Result...       result)
+
+----------
+
+
 ## 线程池的管理 ##
-线程次都实现了`ExecutorService`接口，该接口提供了线程池需要实现的接口，如submit，execute，shutdowm等，使用JDK提供的Executor工厂类创建对象。
+线程池都实现了`ExecutorService`接口，该接口提供了线程池需要实现的接口，如submit，execute，shutdowm等，使用JDK提供的Executor工厂类创建对象。
 
  - ThreadPoolExecutor
  - ScheduleThreadPoolExecutor
