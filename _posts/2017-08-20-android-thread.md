@@ -59,6 +59,11 @@ MyThreadTask.execute(param, param1, param2);
  - onProgressUpdate(ProgressType... progress)
  - onPostExecute   (Result...       result)
 
+注：
+ - AsyncTask必须在主线程中执行。
+ - execute方法必须在UI线程中执行。
+ - AysncTask对象只能执行一次
+
 ----------
 
 
@@ -80,8 +85,10 @@ MyThreadTask.execute(param, param1, param2);
 ## 同步集合 ##
 
 ### 1. 优化策略(空间换时间)
+
  - CopyOnWriteArrayList
  - CopyOnWriteArraySet
+
 ### 2. 提供并发效率
  - ConcurrentHashMap
 HashTable通过Synchronized保证线程安全，但是在激烈的线程竞争下效率十分低下，HashMap线程不安全。为了解决这个问题，引入ConcurrentHashMap使用的`锁分段技术`。
@@ -102,6 +109,7 @@ HashTable通过Synchronized保证线程安全，但是在激烈的线程竞争�
 ## 同步锁 ##
 
 ### 1. 同步机制关键字----synchronized
+synchronized关键字可作用于对象，函数，class（整个类而不是某给对象）。
 
  1）锁定Class中的对象
  
