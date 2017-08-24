@@ -1,7 +1,7 @@
 ---
 layout: post
 title: Android消息机制
-date: 2016-11-21 11:29:08 +0800
+date: 2017-08-23 11:29:08 +0800
 tags: [Android, Handler，Loop，Memory Leak]
 ---
 
@@ -95,6 +95,37 @@ public Handler(Callback callback, boolean async) {
 
  `Implements a thread-local storage, that is, a variable for which each thread has its own value. All threads share the same {@code ThreadLocal} object, but each sees a different value when accessing it, and changes made by one  thread do not affect the other threads`
 
+## 消息机制运行原理##
+
+```
+
+//looper核心代码
+for (;;) {
+    Message msg = queue.next(); // might block
+    if (msg == null) {
+    // No message indicates that the message queue is quitting.
+    return;
+    }
+     ... ...
+}
+
+```
+
+UI线程在Looper.looper()方法中并不是一直循环下去，如果MessageQueue中没有消息，queue.next()会阻塞，UI线程将释放资源，这个过程中涉及Linux pipe/epoll机制（管道是操作系统中常见的一种进程间通信方式）。UI线程处于阻塞状态时，当系统监听到新的消息或者事件的时候会通过pipe写入数据以激活UI线程并处理。
+
+Activity的生命周期都是通过Handler消息机制进行处理的，在ActivityThread的内部类H继承于Handler，系统进程通过ApplicationThreadProxy通知ApplicationThread，而(ActivityThread内部类)ApplicationThead则通过class H通知ActivityThread处理相应事件，如启动Activity，点击事件等。
+
+## Handler内存泄露##
+
+Handler导致内存泄露已经是老生常谈的问题，主要的原因是因为Handler作为内部类执行任务队列时，会持有外部Activity，在任务没有执行完毕的时候无法释放activity导致内存泄露，严重还会引起OOM。解决方案有两种：
+
+ 1. Handler设置为静态类，静态内部类不会持有外部引用，因为静态类可以不依赖外部类实例被实例化，但是静态内部类不能直接访问外部非静态成员，所以引入了弱引用（WeakReference）概念，通过弱引用外部类实例从而实现访问外部非静态变量。
+
+ 2. 及时移除MessageQueue中Msg
+ ```
+ handler.removeCallbacks()
+ handler.removeCallbacksOrMessages()
+ ```
 
 [jekyll-docs]: http://jekyllrb.com/docs/home
 [jekyll-gh]:   https://github.com/jekyll/jekyll
