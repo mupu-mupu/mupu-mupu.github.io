@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Android消息机制
+title: Android 消息机制
 date: 2017-08-23 11:29:08 +0800
 tags: [Android, Handler，Loop，Memory Leak]
 ---
